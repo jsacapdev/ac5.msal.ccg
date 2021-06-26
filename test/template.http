@@ -1,0 +1,12 @@
+###
+POST https://login.microsoftonline.com/<TenantId>/oauth2/v2.0/token HTTP/1.1
+content-type: application/x-www-form-urlencoded
+
+client_id=<client_application_id>&scope=api://<server_application_id>/.default&client_secret=<client_secret_url_encoded_in_pwsh>&grant_type=client_credentials
+
+###
+GET https://localhost:5001/api/WeatherForecast HTTP/1.1
+Authorization: Bearer ???
+###
+GET https://localhost:5001/api/todolist HTTP/1.1
+Authorization: Bearer ???
