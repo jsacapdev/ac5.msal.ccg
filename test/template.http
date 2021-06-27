@@ -7,6 +7,15 @@ client_id=<client_application_id>&scope=api://<server_application_id>/.default&c
 ###
 GET https://localhost:5001/api/WeatherForecast HTTP/1.1
 Authorization: Bearer ???
+
 ###
 GET https://localhost:5001/api/todolist HTTP/1.1
+Authorization: Bearer ???
+
+###
+GET https://api-ccg-dev-we-01.azurewebsites.net/api/WeatherForecast HTTP/1.1
+Authorization: Bearer ???
+
+###
+GET https://api-ccg-dev-we-01.azurewebsites.net/api/todolist HTTP/1.1
 Authorization: Bearer ???

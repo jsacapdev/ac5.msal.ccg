@@ -1,0 +1,109 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "B1",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    "clientId": {
+      "type": "securestring"
+    },
+    "tenantId": {
+      "type": "securestring"
+    },
+    "domainId": {
+      "type": "securestring"
+    }
+
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('skuName')]"
+      },
+      "dependsOn": [],
+      "tags": {
+      },
+      "properties": {
+        "name": "[parameters('appServicePlanName')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "name": "[parameters('appName')]",
+      "type": "Microsoft.Web/sites",
+      "kind": "api",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      ],
+      "tags": {
+        "displayName": "ResourceManagerAppService"
+      },
+      "properties": {
+        "name": "[parameters('appName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "clientAffinityEnabled": false,
+        "httpsOnly": true,
+        "siteConfig": {
+          "AlwaysOn": true,
+          "requestTracingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "httpLoggingEnabled": true,
+          "siteAuthSettings": {
+            "enabled": true,
+            "unauthenticatedClientAction": "AllowAnonymous",
+            "tokenStoreEnabled": true,
+            "defaultProvider": "AzureActiveDirectory",
+            "clientId": "[parameters('clientId')]",
+            "issuer": "[concat('https://sts.windows.net/', parameters('tenantId'), '/v2.0')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('appName'), '/', 'appsettings')]",
+          "type": "Microsoft.Web/sites/config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/sites/', parameters('appName'))]"
+          ],
+          "tags": {
+          },
+          "properties": {
+            "AzureAd__Instance": "https://login.microsoftonline.com/",
+            "AzureAd__ClientId": "[parameters('clientId')]",
+            "AzureAd__Domain": "[concat(parameters('domainId'), '.onmicrosoft.com')]",
+            "AzureAd__TenantId": "[parameters('tenantId')]"
+          }
+        }
+      ]
+    }
+  ]
+}
